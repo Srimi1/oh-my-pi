@@ -78,6 +78,7 @@ Unified LLM API with automatic model discovery, provider configuration, token an
 - **Ollama Cloud** (hosted native Ollama API; requires `OLLAMA_CLOUD_API_KEY`)
 - **llama.cpp** (local OpenAI and Anthropic compatible inference server)
 - **vLLM** (OpenAI-compatible server; `VLLM_API_KEY` for secured deployments)
+- **Command Code** (subscription gateway to top open & closed models; requires `COMMAND_CODE_API_KEY`, optional `COMMAND_CODE_BASE_URL`)
 - **GitHub Copilot** (requires OAuth, see below)
 - **Google Gemini CLI** (requires OAuth, see below)
 - **Antigravity** (requires OAuth, see below)
@@ -960,6 +961,7 @@ In Node.js environments, you can set environment variables to avoid passing API 
 | vLLM           | `VLLM_API_KEY`                                                               |
 | Cloudflare AI Gateway | `CLOUDFLARE_AI_GATEWAY_API_KEY`                                      |
 | GitHub Copilot | `COPILOT_GITHUB_TOKEN` or `GH_TOKEN` or `GITHUB_TOKEN`                      |
+| Command Code   | `COMMAND_CODE_API_KEY` (optional `COMMAND_CODE_BASE_URL` to override the base URL)        |
 
 For Cloudflare AI Gateway models, use provider base URL format
 `https://gateway.ai.cloudflare.com/v1/<account>/<gateway>/anthropic`.

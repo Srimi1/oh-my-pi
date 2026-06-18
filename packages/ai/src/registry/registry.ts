@@ -6,6 +6,7 @@ import { anthropicProvider } from "./anthropic";
 import { azureProvider } from "./azure";
 import { cerebrasProvider } from "./cerebras";
 import { cloudflareAiGatewayProvider } from "./cloudflare-ai-gateway";
+import { commandCodeProvider } from "./command-code";
 import { cursorProvider } from "./cursor";
 import { deepseekProvider } from "./deepseek";
 import { firepassProvider } from "./firepass";
@@ -96,6 +97,7 @@ const ALL = [
 	xiaomiTokenPlanCnProvider,
 	firepassProvider,
 	waferPassProvider,
+	commandCodeProvider,
 	deepseekProvider,
 	moonshotProvider,
 	cerebrasProvider,

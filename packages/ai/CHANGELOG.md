@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Added
+
+- Added Command Code as a provider: interactive `/login` paste-key flow plus `COMMAND_CODE_API_KEY` and `COMMAND_CODE_BASE_URL` environment variables, exposing a Command Code subscription's models through its OpenAI-compatible Provider API (`https://api.commandcode.ai/provider/v1`).
+
 ## [16.0.5] - 2026-06-17
 
 ### Added

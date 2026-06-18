@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Added
+
+- Added the `command-code` provider descriptor and `commandCodeModelManagerOptions` (OpenAI-compatible model discovery against `https://api.commandcode.ai/provider/v1`, with `COMMAND_CODE_BASE_URL` override), registered as discovery-only so a subscription's models are fetched live at runtime and never baked into `models.json`.
+
 ## [16.0.5] - 2026-06-17
 
 ### Added

@@ -2216,6 +2216,40 @@ export function lmStudioModelManagerOptions(
 }
 
 // ---------------------------------------------------------------------------
+// 12.6. Command Code (cloud OpenAI-compatible aggregator)
+// ---------------------------------------------------------------------------
+
+export interface CommandCodeModelManagerConfig {
+	apiKey?: string;
+	baseUrl?: string;
+	fetch?: FetchImpl;
+}
+
+export function commandCodeModelManagerOptions(
+	config?: CommandCodeModelManagerConfig,
+): ModelManagerOptions<"openai-completions"> {
+	const apiKey = config?.apiKey;
+	const baseUrl = config?.baseUrl ?? Bun.env.COMMAND_CODE_BASE_URL ?? "https://api.commandcode.ai/provider/v1";
+	const references = createBundledReferenceMap<"openai-completions">("command-code" as any);
+	return {
+		providerId: "command-code",
+		dynamicModelsAuthoritative: true,
+		fetchDynamicModels: () =>
+			fetchOpenAICompatibleModels({
+				api: "openai-completions",
+				provider: "command-code",
+				baseUrl,
+				apiKey,
+				mapModel: (entry, defaults) => {
+					const reference = references.get(defaults.id);
+					return mapWithBundledReference(entry, defaults, reference);
+				},
+				fetch: config?.fetch,
+			}),
+	};
+}
+
+// ---------------------------------------------------------------------------
 // 13. Synthetic
 // ---------------------------------------------------------------------------
 

@@ -5,6 +5,7 @@ import * as os from "node:os";
 import * as path from "node:path";
 
 import { AuthStorage, SqliteAuthCredentialStore } from "@oh-my-pi/pi-ai/auth-storage";
+import * as commandCodeModule from "@oh-my-pi/pi-ai/registry/command-code";
 import * as deepseekModule from "@oh-my-pi/pi-ai/registry/deepseek";
 import * as kagiModule from "@oh-my-pi/pi-ai/registry/kagi";
 import * as ollamaCloudModule from "@oh-my-pi/pi-ai/registry/ollama-cloud";
@@ -26,6 +27,7 @@ describe("AuthStorage api-key login replacement", () => {
 	let dbPath = "";
 	let store: SqliteAuthCredentialStore | null = null;
 	let authStorage: AuthStorage | null = null;
+	let loginCommandCodeSpy: Mock<typeof commandCodeModule.loginCommandCode>;
 	let loginDeepSeekSpy: Mock<typeof deepseekModule.loginDeepSeek>;
 	let loginKagiSpy: Mock<typeof kagiModule.loginKagi>;
 	let loginOllamaCloudSpy: Mock<typeof ollamaCloudModule.loginOllamaCloud>;
@@ -35,6 +37,7 @@ describe("AuthStorage api-key login replacement", () => {
 		dbPath = path.join(tempDir, "agent.db");
 		store = await SqliteAuthCredentialStore.open(dbPath);
 		authStorage = new AuthStorage(store);
+		loginCommandCodeSpy = vi.spyOn(commandCodeModule, "loginCommandCode");
 		loginDeepSeekSpy = vi.spyOn(deepseekModule, "loginDeepSeek");
 		loginKagiSpy = vi.spyOn(kagiModule, "loginKagi");
 		loginOllamaCloudSpy = vi.spyOn(ollamaCloudModule, "loginOllamaCloud");
@@ -102,6 +105,32 @@ describe("AuthStorage api-key login replacement", () => {
 		expect(stored.credential.key).toBe("same-ollama-cloud-key");
 		expect(store.getApiKey("ollama-cloud")).toBe("same-ollama-cloud-key");
 		expect(await authStorage.getApiKey("ollama-cloud", "session-ollama-cloud-relogin")).toBe("same-ollama-cloud-key");
+	});
+
+	it("reuses the stored api-key row when command-code re-login returns the same key", async () => {
+		if (!store || !authStorage || !dbPath) throw new Error("test setup failed");
+
+		loginCommandCodeSpy.mockResolvedValueOnce("same-command-code-key").mockResolvedValueOnce("same-command-code-key");
+
+		const controller = {
+			onAuth: () => {},
+			onPrompt: async () => "",
+		};
+
+		await authStorage.login("command-code", controller);
+		await authStorage.login("command-code", controller);
+
+		expect(countCredentialRows(dbPath, "command-code")).toBe(1);
+		const credentials = store.listAuthCredentials("command-code");
+		expect(credentials).toHaveLength(1);
+		const [stored] = credentials;
+		expect(stored?.credential.type).toBe("api_key");
+		if (stored?.credential.type !== "api_key") {
+			throw new Error("expected stored api-key credential");
+		}
+		expect(stored.credential.key).toBe("same-command-code-key");
+		expect(store.getApiKey("command-code")).toBe("same-command-code-key");
+		expect(await authStorage.getApiKey("command-code", "session-command-code-relogin")).toBe("same-command-code-key");
 	});
 
 	it("stores DeepSeek login credentials as a reusable api-key credential", async () => {
